@@ -241,11 +241,15 @@ class Board:
             check_pos((y + 1, x), False)
             check_pos((y + 1, x + 1), True)
             check_pos((y + 1, x - 1), True)
+            if y == 1:
+                check_pos((y + 2, x), False)
 
         if color == 'white':
             check_pos((y - 1, x), False)
             check_pos((y - 1, x + 1), True)
             check_pos((y - 1, x - 1), True)
+            if y == 6:
+                check_pos((y - 2, x), False)
 
     # Returns a list of all valid destinations (y, x) for a piece at a given position
     def get_moves(self, pos, color):
