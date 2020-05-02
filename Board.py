@@ -199,7 +199,6 @@ class Board:
 
     # Adds all valid king moves for the given color to the moves list
     def __get_king_moves__(self, pos, color, moves):
-        # TODO: Consider when the king cannot move into check
         # TODO: Consider castling
 
         # Checks a position on the board and adds it to the moves list if valid
@@ -225,7 +224,7 @@ class Board:
     # Adds all valid pawn moves for the given color to the moves list
     def __get_pawn_moves__(self, pos, color, moves):
         # TODO: Consider en passant
-        # TODO: Consider pawns starting with 2 moves
+        # TODO: Consider pawns starting with 2 moves, make sure they don't jump pieces!
         def check_pos(new_pos, diag):
             if valid_pos(new_pos):
                 y2, x2 = new_pos

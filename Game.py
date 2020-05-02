@@ -6,15 +6,32 @@ class Game:
     def __init__(self):
         self.board = Board()
         self.ai = Skywalker()
-        self.ai_cfg = {"color": "white"}
+        self.ai_cfg = {"color": "black"}
+        self.history = []
 
     def run_game(self):
         # TODO: Check for game finish (stalemate, 50 turn rule, checkmate)
         while True:
-            print("\n" + "-" * 60 + "\n" + str(self.board) + "\n" + "-" * 60 + "\n")
-            print("AI recommends... " + self.ai.generate_naive_move(self.board, self.ai_cfg))
-            move = input("Enter a move: ")
-            self.make_move(move)
+            self.history.append(self.board.copy())
+            while True:
+                try:
+                    print("\n" + "-" * 60 + "\n" + str(self.board) + "\n" + "-" * 60 + "\n")
+                    print("AI recommends... " + self.ai.generate_naive_move(self.board, self.ai_cfg))
+                    move = input("Enter a move: ")
+                    if move == "REWIND":
+                        if len(self.history) > 1:
+                            self.board = self.history[-2]
+                            self.history.pop()
+                            print("Reset board to previous state.")
+                        else:
+                            print("No board history available.")
+                    else:
+                        self.make_move(move)
+                        break
+                except KeyboardInterrupt:
+                    raise KeyboardInterrupt("Program ended by user.")
+                except:
+                    print("Invalid input.")
             
     
     # Accepts moves as "e4e5" (or "d7d8Q" in case of promotion)
