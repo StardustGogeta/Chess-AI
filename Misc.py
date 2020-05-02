@@ -16,8 +16,11 @@ def human_move_to_tuple(move):
 
 # Converts a tuple in (row, col) form to a move in human form ("e7")
 def tuple_to_human_move(move):
-    row, col = move
-    return chr(col + ord('a')) + str(8 - row)
+    row, col = move[:2]
+    ret = chr(col + ord('a')) + str(8 - row)
+    if len(move) == 3:
+        return ret + "" + move[2]
+    return ret
 
 # Returns whether a position is located on the board
 def valid_pos(pos):

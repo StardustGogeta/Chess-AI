@@ -32,17 +32,18 @@ class Game:
         # Convert to zero-based indices
         row0, col0 = human_move_to_tuple(move[0:2])
         row1, col1 = human_move_to_tuple(move[2:4])
+        if len(move) > 4:
+            return self.__force_move_tuple__(((row0, col0), (row1, col1, move[4])))
         return self.__force_move_tuple__(((row0, col0), (row1, col1)))
 
     # Accepts move without performing any validation
     def __force_move_tuple__(self, move):
-        if len(move) == 2:
+        if len(move[1]) == 2:
             (row0, col0), (row1, col1) = move
+            self.board.move((row0, col0), (row1, col1))
         else:
-            raise Exception("Promotion not implemented!")
-
-        # TODO: Add pawn promotion
-        self.board.move((row0, col0), (row1, col1))
+            (row0, col0), (row1, col1, promotion) = move
+            self.board.move((row0, col0), (row1, col1, promotion))
         return self
 
     def __repr__(self):

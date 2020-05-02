@@ -37,7 +37,7 @@ class Board:
     def move(self, start, end):
         piece = self.board[start[0]][start[1]]
         self.board[start[0]][start[1]] = 0
-        self.board[end[0]][end[1]] = piece
+        self.board[end[0]][end[1]] = piece if len(end) == 2 else end[2] # Promotion
         return self
 
     # Creates a deep copy of the current board
@@ -229,7 +229,11 @@ class Board:
                 y2, x2 = new_pos
                 piece2 = self.board[y2][x2]
                 if (not diag and not piece2) or (diag and piece2 and color != piece_color(piece2)):
-                    moves.append((y2, x2))
+                    if y2 in [0, 7]:
+                        # Promote to queen by default
+                        moves.append((y2, x2, "Q" if color == 'white' else "q"))
+                    else:
+                        moves.append((y2, x2))
 
         y, x = pos
 
