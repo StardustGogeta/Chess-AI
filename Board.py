@@ -201,8 +201,19 @@ class Board:
     def __get_king_moves__(self, pos, color, moves):
         # TODO: Consider when the king cannot move into check
         # TODO: Consider castling
+
+        # Returns whether a certain position can be attacked by the enemy
+        def check_for_attacks(new_pos):
+            for y3 in range(8):
+                for x3 in range(8):
+                    piece3 = self.board[y3][x3]
+                    color3 = piece_color(piece3)
+                    if color != color3 and new_pos in self.get_moves((y3, x3), color3):
+                        return True
+
+        # Checks a position on the board and adds it to the moves list if valid
         def check_pos(new_pos):
-            if valid_pos(new_pos):
+            if valid_pos(new_pos) and not check_for_attacks(new_pos):
                 y2, x2 = new_pos
                 piece2 = self.board[y2][x2]
                 if not piece2 or color != piece_color(piece2):
