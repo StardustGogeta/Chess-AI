@@ -23,15 +23,20 @@ class Skywalker:
         color = config['color']
         best_move = ((0, 0), (0, 0), -1000)
         squares = list(all_squares())
-        for (y, x) in random.sample(squares, int(len(squares) * 3/4)):
+        # Randomize selected squares / pieces
+        for (y, x) in random.sample(squares, int(len(squares) * 4/4)):
             moves = board.get_moves((y, x), color)
             if moves:
+                # Randomize order of moves evaluated
+                random.shuffle(moves)
                 for move in moves:
                     new_board = board.copy()
                     new_board.move((y, x), move)
                     value = self.get_board_value(new_board, config)
                     if value > best_move[2]:
                         best_move = ((y, x), move, value)
+        if best_move[2] == -1000:
+            return "AI FAILED - Checkmate inevitable?"
         return tuple_to_human_move(best_move[0]) + '' + tuple_to_human_move(best_move[1])
 
 

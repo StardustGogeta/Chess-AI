@@ -1,5 +1,5 @@
 import copy
-from Misc import piece_color, valid_pos
+from Misc import piece_color, valid_pos, all_squares
 
 class Board:
     def __init__(self, board = None):
@@ -202,18 +202,9 @@ class Board:
         # TODO: Consider when the king cannot move into check
         # TODO: Consider castling
 
-        # Returns whether a certain position can be attacked by the enemy
-        def check_for_attacks(new_pos):
-            for y3 in range(8):
-                for x3 in range(8):
-                    piece3 = self.board[y3][x3]
-                    color3 = piece_color(piece3)
-                    if color != color3 and new_pos in self.get_moves((y3, x3), color3):
-                        return True
-
         # Checks a position on the board and adds it to the moves list if valid
         def check_pos(new_pos):
-            if valid_pos(new_pos) and not check_for_attacks(new_pos):
+            if valid_pos(new_pos):
                 y2, x2 = new_pos
                 piece2 = self.board[y2][x2]
                 if not piece2 or color != piece_color(piece2):
@@ -262,8 +253,29 @@ class Board:
             if y == 6:
                 check_pos((y - 2, x), False)
 
+    # Returns whether the king of a certain color is in check
+    def check_for_attacks(self, color):
+        # Find king
+        target = 'K' if color == 'white' else 'k'
+        for (y, x) in all_squares():
+            if self.board[y][x] == target:
+                king = (y, x)
+                break
+
+        # Check for attacking pieces
+        for (y2, x2) in all_squares():
+            piece2 = self.board[y2][x2]
+            color2 = piece_color(piece2)
+            if color != color2 and king in self.get_moves((y2, x2), color2, check_for_check=False):
+                return True
+        return False
+
+    # Tells whether a move will put the king into check
+    def puts_into_check(self, start, end, color):
+        return self.copy().move(start, end).check_for_attacks(color)
+
     # Returns a list of all valid destinations (y, x) for a piece at a given position
-    def get_moves(self, pos, color):
+    def get_moves(self, pos, color, *, check_for_check = True):
         y, x = pos
         piece = self.board[y][x]
         if not piece:
@@ -298,6 +310,10 @@ class Board:
                 if lower == 'p':
                     self.__get_pawn_moves__(pos, color, moves)
 
+            # if pos == (2, 7): print("PRECHECK", moves)
+            if check_for_check:
+                moves = list(filter(lambda move: not self.puts_into_check(pos, move, color), moves))
+            # if pos == (2, 7): print("\tPOSTCHECK", moves)
             return moves
 
     def __repr__(self):
