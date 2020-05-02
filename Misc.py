@@ -23,3 +23,9 @@ def tuple_to_human_move(move):
 def valid_pos(pos):
     y, x = pos
     return 0 <= y < 8 and 0 <= x < 8
+
+# Returns a list of all valid squares on the board
+def all_squares():
+    for y in range(8):
+        for x in range(8):
+            yield (y, x)

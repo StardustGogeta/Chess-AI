@@ -1,8 +1,8 @@
 # Main AI file
 # Controls all functions of chess play from high-level perspective
 
-import time
-from Misc import piece_color, tuple_to_human_move
+import time, random
+from Misc import piece_color, tuple_to_human_move, all_squares
 
 class Skywalker:
     # All configs are given as follows:
@@ -22,17 +22,17 @@ class Skywalker:
     def generate_naive_move(self, board, config):
         color = config['color']
         best_move = ((0, 0), (0, 0), -1000)
-        for y in range(8):
-            for x in range(8):
-                moves = board.get_moves((y, x), color)
-                if moves:
-                    for move in moves:
-                        new_board = board.copy()
-                        new_board.move((y, x), move)
-                        value = self.get_board_value(new_board, config)
-                        if value > best_move[2]:
-                            best_move = ((y, x), move, value)
-        return tuple_to_human_move(best_move[0]) + '-' + tuple_to_human_move(best_move[1])
+        squares = list(all_squares())
+        for (y, x) in random.sample(squares, int(len(squares) * 3/4)):
+            moves = board.get_moves((y, x), color)
+            if moves:
+                for move in moves:
+                    new_board = board.copy()
+                    new_board.move((y, x), move)
+                    value = self.get_board_value(new_board, config)
+                    if value > best_move[2]:
+                        best_move = ((y, x), move, value)
+        return tuple_to_human_move(best_move[0]) + '' + tuple_to_human_move(best_move[1])
 
 
     def generate_move(self, board, config):
