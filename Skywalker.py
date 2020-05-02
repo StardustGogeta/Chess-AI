@@ -2,7 +2,7 @@
 # Controls all functions of chess play from high-level perspective
 
 import time
-from Misc import piece_color
+from Misc import piece_color, tuple_to_human_move
 
 class Skywalker:
     # All configs are given as follows:
@@ -32,7 +32,7 @@ class Skywalker:
                         value = self.get_board_value(new_board, config)
                         if value > best_move[2]:
                             best_move = ((y, x), move, value)
-        return best_move
+        return tuple_to_human_move(best_move[0]) + '-' + tuple_to_human_move(best_move[1])
 
 
     def generate_move(self, board, config):

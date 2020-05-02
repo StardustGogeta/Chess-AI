@@ -251,7 +251,7 @@ class Board:
             # print("EMPTY")
             return []
         if piece:
-            print("PIECE", piece, y, x)
+            # print("PIECE", piece, y, x)
             lower = piece.lower()
             p_color = piece_color(piece)
 

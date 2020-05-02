@@ -5,6 +5,17 @@ from Misc import human_move_to_tuple
 class Game:
     def __init__(self):
         self.board = Board()
+        self.ai = Skywalker()
+        self.ai_cfg = {"color": "white"}
+
+    def run_game(self):
+        # TODO: Check for game finish (stalemate, 50 turn rule, checkmate)
+        while True:
+            print("\n" + "-" * 60 + "\n" + str(self.board) + "\n" + "-" * 60 + "\n")
+            print("AI recommends... " + self.ai.generate_naive_move(self.board, self.ai_cfg))
+            move = input("Enter a move: ")
+            self.make_move(move)
+            
     
     # Accepts moves as "e4e5" (or "d7d8Q" in case of promotion)
     def make_move(self, move):
@@ -41,14 +52,17 @@ class Game:
 if __name__ == "__main__":
     print("Testing!")
     g = Game()
-    print(g)
-    print("\n")
-    g.make_move("e2e4")
-    print(g)
-    print("\n")
 
-    S = Skywalker()
-    cfg = {"color": "white"}
+    g.run_game()
+
+    # print(g)
+    # print("\n")
+    # g.make_move("e2e4")
+    # print(g)
+    # print("\n")
+
+    # S = Skywalker()
+    # cfg = {"color": "white"}
 
     # while True:
     #     g.make_move(input("Enter a move: "))
@@ -56,7 +70,7 @@ if __name__ == "__main__":
     #     print(S.get_board_value(g.board, cfg))
     #     print("\n")
 
-    print(g.board.get_moves(human_move_to_tuple("b1"), 'white'))
+    # print(g.board.get_moves(human_move_to_tuple("b1"), 'white'))
 
-    print(S.generate_naive_move(g.board, cfg))
+    # print(S.generate_naive_move(g.board, cfg))
 
