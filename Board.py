@@ -244,40 +244,42 @@ class Board:
             check_pos((y - 1, x - 1), True)
 
     # Returns a list of all valid destinations (y, x) for a piece at a given position
-    def get_moves(self, pos):
+    def get_moves(self, pos, color):
         y, x = pos
         piece = self.board[y][x]
         if not piece:
-            print("EMPTY")
+            # print("EMPTY")
+            return []
         if piece:
             print("PIECE", piece, y, x)
             lower = piece.lower()
-            color = piece_color(piece)
+            p_color = piece_color(piece)
 
             moves = []
 
-            # Rook or Queen
-            if lower == 'r' or lower == 'q':
-                self.__get_rook_moves__(pos, color, moves)
+            # Check that we are not moving the opponent's pieces
+            if p_color == color:
+                # Rook or Queen
+                if lower == 'r' or lower == 'q':
+                    self.__get_rook_moves__(pos, color, moves)
 
-            # Knight
-            if lower == 'n':
-                self.__get_knight_moves__(pos, color, moves)
-            
-            # Bishop or Queen
-            if lower == 'b' or lower == 'q':
-                self.__get_bishop_moves__(pos, color, moves)
+                # Knight
+                if lower == 'n':
+                    self.__get_knight_moves__(pos, color, moves)
+                
+                # Bishop or Queen
+                if lower == 'b' or lower == 'q':
+                    self.__get_bishop_moves__(pos, color, moves)
 
-            # King
-            if lower == 'k':
-                self.__get_king_moves__(pos, color, moves)
+                # King
+                if lower == 'k':
+                    self.__get_king_moves__(pos, color, moves)
 
-            # Pawn
-            if lower == 'p':
-                self.__get_pawn_moves__(pos, color, moves)
+                # Pawn
+                if lower == 'p':
+                    self.__get_pawn_moves__(pos, color, moves)
 
             return moves
-        return []
 
     def __repr__(self):
         return '\n'.join('\t'.join((f'[{piece}]' if piece else '*') for piece in row) for row in self.board)

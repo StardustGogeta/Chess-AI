@@ -56,7 +56,7 @@ if __name__ == "__main__":
     #     print(S.get_board_value(g.board, cfg))
     #     print("\n")
 
-    print(g.board.get_moves(human_move_to_tuple("b1")))
+    print(g.board.get_moves(human_move_to_tuple("b1"), 'white'))
 
     print(S.generate_naive_move(g.board, cfg))
 

@@ -20,10 +20,11 @@ class Skywalker:
 
     # Generate a naive move based on the highest immediate board value possible
     def generate_naive_move(self, board, config):
+        color = config['color']
         best_move = ((0, 0), (0, 0), -1000)
         for y in range(8):
             for x in range(8):
-                moves = board.get_moves((y, x))
+                moves = board.get_moves((y, x), color)
                 if moves:
                     for move in moves:
                         new_board = board.copy()
