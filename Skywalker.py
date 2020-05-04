@@ -17,11 +17,11 @@ class Skywalker:
 
         Accepts Board object and config dictionary
 
-        Uses standard piece values (and 100 for king)
+        Uses standard piece values (and 8 for king)
         """
         # print("Getting piece value!")
         board = board.board
-        values = {'p': 1, 'n': 3, 'b': 3, 'q': 9, 'k': 100, 'r': 5}
+        values = {'p': 1, 'n': 3, 'b': 3, 'q': 9, 'k': 8, 'r': 5}
         black_value = sum(sum(values[piece] for piece in row if piece and piece_color(piece) == "black") for row in board)
         white_value = sum(sum(values[piece.lower()] for piece in row if piece and piece_color(piece) == "white") for row in board)
         return white_value - black_value if config['color'] == 'white' else black_value - white_value
