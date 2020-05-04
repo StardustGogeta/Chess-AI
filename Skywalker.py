@@ -86,10 +86,10 @@ class Skywalker:
         elif depth == 2:
             # Predicted best piece value in one full-turn (naive opponent, naive response)
             tphm = tuple_pair_to_human_move # Shorthand
-            opponent_naive_move = self.generate_naive_move(new_board, opp_config)
+            opponent_shortsighted_move = self.generate_predictive_piece_value_move(new_board, opp_config, 1)
             debug_str = f"Starting with move {tphm(move)},\n"
-            debug_str += f"Predicts that enemy will naively move {tphm(opponent_naive_move[0])}...\n"
-            naive_resp = self.generate_naive_move(new_board.copy().move(*opponent_naive_move[0]), config)
+            debug_str += f"Predicts that enemy will shortsightedly move {tphm(opponent_shortsighted_move[0])}...\n"
+            naive_resp = self.generate_naive_move(new_board.copy().move(*opponent_shortsighted_move[0]), config)
             debug_str += f"Predicts that player will naively respond {tphm(naive_resp[0])}...\n"
             debug_str += f"Results in value of {naive_resp[1]}...\n"
             return naive_resp[1], debug_str
@@ -126,7 +126,7 @@ class Skywalker:
                         best_move = (move, value)
                         if debug_str: print(debug_str)
         if best_move[1] == -1000:
-            return ("AI FAILED - Checkmate inevitable?", -1000)
+            return (((0, 0), (0, 0)), -1000)
         return best_move
 
     def generate_move_by_level(self, board, config, level):

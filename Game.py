@@ -30,7 +30,7 @@ class Game:
                         break
                 except KeyboardInterrupt:
                     raise KeyboardInterrupt("Program ended by user.")
-                except ZeroDivisionError:
+                except:
                     print("Invalid input.")
             
     
@@ -70,6 +70,17 @@ class Game:
 if __name__ == "__main__":
     print("Testing!")
     g = Game()
+
+    g.board.load([
+        [0, 0, 0, 0, 0, 0, 'r', 0],
+        ['r', 0, 0, 0, 'k', 'n', 0, 0],
+        [0, 0, 'p', 0, 0, 'p', 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 'p'],
+        [0, 'R', 0, 'p', 0, 0, 0, 0],
+        [0, 0, 0, 'N', 'q', 'p', 0, 0],
+        [0, 0, 'K', 'R', 0, 'N', 0, 0],
+        [0, 0, 0, 'Q', 0, 0, 0, 0]
+    ])
 
     g.run_game()
 
