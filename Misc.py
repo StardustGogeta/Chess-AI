@@ -24,7 +24,10 @@ def tuple_to_human_move(move):
 
 # Converts a tuple in ((row, col), (row, col)) form to a move in human form ("e7d3")
 def tuple_pair_to_human_move(move):
-    return ''.join(map(tuple_to_human_move, move))
+    if len(move) == 2:
+        return ''.join(map(tuple_to_human_move, move))
+    else:
+        return str(move) # Occurs with malformatted input (in case of checkmate, etc.)
 
 # Returns whether a position is located on the board
 def valid_pos(pos):

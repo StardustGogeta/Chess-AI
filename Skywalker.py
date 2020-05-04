@@ -126,7 +126,7 @@ class Skywalker:
                         best_move = (move, value)
                         if debug_str: print(debug_str)
         if best_move[1] == -1000:
-            return "AI FAILED - Checkmate inevitable?"
+            return ("AI FAILED - Checkmate inevitable?", -1000)
         return best_move
 
     def generate_move_by_level(self, board, config, level):
