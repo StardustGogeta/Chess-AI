@@ -252,15 +252,19 @@ class Board:
             if y == 6:
                 check_pos((y - 2, x), False)
 
-    # Returns whether the king of a certain color is in check
+    # Returns whether the king of a certain color is in check or is dead
     def check_for_attacks(self, color):
         # Find king
+        found = False
         target = 'K' if color == 'white' else 'k'
         for (y, x) in all_squares():
             if self.board[y][x] == target:
                 king = (y, x)
+                found = True
                 break
-
+        if not found:
+            print(f"Looking for {target}, {color}, but not found!")
+            return False # To allow a dead side to make hypothetical postmortem moves
         # Check for attacking pieces
         for (y2, x2) in all_squares():
             piece2 = self.board[y2][x2]

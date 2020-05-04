@@ -2,7 +2,7 @@
 # Controls all functions of chess play from high-level perspective
 
 import time, random
-from Misc import piece_color, tuple_to_human_move, all_squares
+from Misc import piece_color, tuple_pair_to_human_move, all_squares
 
 class Skywalker:
     # All configs are given as follows:
@@ -71,23 +71,28 @@ class Skywalker:
         """
         color = config['color']
         opp_color = 'white' if color == 'black' else 'black'
-        opp_config = config
+        opp_config = config.copy()
         opp_config['color'] = opp_color
 
         new_board = board.copy().move(*move)
 
         # Immediate piece value
         if depth == 0:
-            return self.get_piece_value(new_board, config)
+            return self.get_piece_value(new_board, config), ""
         elif depth == 1:
             # Predicted best piece value in one half-turn (naive opponent)
             opp_naive_move = self.generate_naive_move(new_board, opp_config)
-            return -1 * opp_naive_move[1] # Flip sign of piece value
+            return -1 * opp_naive_move[1], "" # Flip sign of piece value
         elif depth == 2:
             # Predicted best piece value in one full-turn (naive opponent, naive response)
+            tphm = tuple_pair_to_human_move # Shorthand
             opponent_naive_move = self.generate_naive_move(new_board, opp_config)
+            debug_str = f"Starting with move {tphm(move)},\n"
+            debug_str += f"Predicts that enemy will naively move {tphm(opponent_naive_move[0])}...\n"
             naive_resp = self.generate_naive_move(new_board.copy().move(*opponent_naive_move[0]), config)
-            return naive_resp[1]
+            debug_str += f"Predicts that player will naively respond {tphm(naive_resp[0])}...\n"
+            debug_str += f"Results in value of {naive_resp[1]}...\n"
+            return naive_resp[1], debug_str
 
     def generate_predictive_piece_value_move(self, board, config, depth = 1):
         """
@@ -105,6 +110,7 @@ class Skywalker:
         (When depth=0, devolves to naive case)
         """
         color = config['color']
+        if depth == 2: print(f"FINDING BEST MOVE FOR COLOR {color}")
         best_move = (((0, 0), (0, 0)), -1000)
         squares = list(all_squares())
         # Randomize selected squares / pieces
@@ -115,9 +121,10 @@ class Skywalker:
                 random.shuffle(dests)
                 for dest in dests:
                     move = ((y, x), dest)
-                    value = self.generate_predictive_piece_value_after_move(board, config, move, depth)
+                    value, debug_str = self.generate_predictive_piece_value_after_move(board, config, move, depth)
                     if value > best_move[1]:
                         best_move = (move, value)
+                        if debug_str: print(debug_str)
         if best_move[1] == -1000:
             return "AI FAILED - Checkmate inevitable?"
         return best_move
@@ -127,7 +134,7 @@ class Skywalker:
             tuple_move = self.generate_naive_move(board, config)[0]
         else:
             tuple_move = self.generate_predictive_piece_value_move(board, config, depth=level)[0]
-        return tuple_to_human_move(tuple_move[0]) + '' + tuple_to_human_move(tuple_move[1])
+        return tuple_pair_to_human_move(tuple_move)
 
 
     def generate_move(self, board, config):
