@@ -2,6 +2,8 @@ from Board import Board
 from Skywalker import Skywalker
 from Misc import human_move_to_tuple
 
+DEBUGGING = True
+
 class Game:
     def __init__(self):
         self.board = Board()
@@ -30,7 +32,9 @@ class Game:
                         break
                 except KeyboardInterrupt:
                     raise KeyboardInterrupt("Program ended by user.")
-                except:
+                except Exception as err:
+                    if DEBUGGING:
+                        raise err 
                     print("Invalid input.")
             
     

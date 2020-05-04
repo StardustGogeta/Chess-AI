@@ -32,36 +32,10 @@ class Skywalker:
 
     def generate_naive_move(self, board, config):
         return self.generate_predictive_piece_value_move(board, config, depth=0)
-        # """
-        # Level 0: Generate a naive move based on the highest immediate piece value possible
 
-        # "Immediate Gratification" / "Greedy" Approach
-
-        # Key Properties:
-        # - Looks one half-turn ahead
-        # - Finds all possible moves
-        # - Randomly sorts moves (optionally trimming off a fraction at random)
-        # - Gets move that results in best piece value
-        # - Sends chosen move and the resultant piece value
-        # """
-        # color = config['color']
-        # best_move = ((0, 0), (0, 0), -1000)
-        # squares = list(all_squares())
-        # # Randomize selected squares / pieces
-        # for (y, x) in random.sample(squares, int(len(squares) * 4/4)):
-        #     moves = board.get_moves((y, x), color)
-        #     if moves:
-        #         # Randomize order of moves evaluated
-        #         random.shuffle(moves)
-        #         for move in moves:
-        #             new_board = board.copy()
-        #             new_board.move((y, x), move)
-        #             value = self.get_piece_value(new_board, config)
-        #             if value > best_move[1]:
-        #                 best_move = ((y, x), move), value)
-        # if best_move[2] == -1000:
-        #     return "AI FAILED - Checkmate inevitable?"
-        # return best_move
+    def generate_shortsighted_move(self, board, config):
+        return self.generate_predictive_piece_value_move(board, config, depth=1)
+        
 
     def generate_predictive_piece_value_after_move(self, board, config, move, depth = 1):
         """
@@ -76,23 +50,24 @@ class Skywalker:
 
         new_board = board.copy().move(*move)
 
+        tphm = tuple_pair_to_human_move # Shorthand
         # Immediate piece value
         if depth == 0:
             return self.get_piece_value(new_board, config), ""
         elif depth == 1:
             # Predicted best piece value in one half-turn (naive opponent)
             opp_naive_move = self.generate_naive_move(new_board, opp_config)
+            # debug_str = f"\t[Shortsightedness predicts that {tphm(opp_naive_move[0])} will follow...]\n"
             return -1 * opp_naive_move[1], "" # Flip sign of piece value
         elif depth == 2:
             # Predicted best piece value in one full-turn (naive opponent, naive response)
-            tphm = tuple_pair_to_human_move # Shorthand
-            opponent_shortsighted_move = self.generate_predictive_piece_value_move(new_board, opp_config, 1)
+            opponent_shortsighted_move = self.generate_shortsighted_move(new_board, opp_config)
             debug_str = f"Starting with move {tphm(move)},\n"
             debug_str += f"Predicts that enemy will shortsightedly move {tphm(opponent_shortsighted_move[0])}...\n"
-            naive_resp = self.generate_naive_move(new_board.copy().move(*opponent_shortsighted_move[0]), config)
-            debug_str += f"Predicts that player will naively respond {tphm(naive_resp[0])}...\n"
-            debug_str += f"Results in value of {naive_resp[1]}...\n"
-            return naive_resp[1], debug_str
+            player_resp = self.generate_shortsighted_move(new_board.copy().move(*opponent_shortsighted_move[0]), config)
+            debug_str += f"Predicts that player will shortsightedly respond {tphm(player_resp[0])}...\n"
+            debug_str += f"Results in value of {player_resp[1]}...\n"
+            return player_resp[1], debug_str
 
     def generate_predictive_piece_value_move(self, board, config, depth = 1):
         """
