@@ -1,3 +1,4 @@
+import time
 from Board import Board
 from Skywalker import Skywalker
 from Misc import human_move_to_tuple
@@ -18,7 +19,9 @@ class Game:
             while True:
                 try:
                     print("\n" + "-" * 60 + "\n" + str(self.board) + "\n" + "-" * 60 + "\n")
+                    start = time.perf_counter()
                     print("AI recommends... " + self.ai.generate_move_by_level(self.board, self.ai_cfg, 2))
+                    print(f"Time elapsed: {time.perf_counter()-start}")
                     move = input("Enter a move: ")
                     if move == "REWIND":
                         if len(self.history) > 1:
@@ -32,6 +35,8 @@ class Game:
                         break
                 except KeyboardInterrupt:
                     raise KeyboardInterrupt("Program ended by user.")
+                except (ValueError, IndexError):
+                    print("Invalid input.")
                 except Exception as err:
                     if DEBUGGING:
                         raise err 

@@ -48,26 +48,31 @@ class Skywalker:
         opp_config = config.copy()
         opp_config['color'] = opp_color
 
-        new_board = board.copy().move(*move)
+        move_cache = board.move(*move)[1]
 
         tphm = tuple_pair_to_human_move # Shorthand
         # Immediate piece value
         if depth == 0:
-            return self.get_piece_value(new_board, config), ""
+            ret = (self.get_piece_value(board, config), "")
         elif depth == 1:
             # Predicted best piece value in one half-turn (naive opponent)
-            opp_naive_move = self.generate_naive_move(new_board, opp_config)
+            opp_naive_move = self.generate_naive_move(board, opp_config)
             # debug_str = f"\t[Shortsightedness predicts that {tphm(opp_naive_move[0])} will follow...]\n"
-            return -1 * opp_naive_move[1], "" # Flip sign of piece value
+            ret = (-1 * opp_naive_move[1], "") # Flip sign of piece value
         elif depth == 2:
             # Predicted best piece value in one full-turn (naive opponent, naive response)
-            opponent_shortsighted_move = self.generate_shortsighted_move(new_board, opp_config)
+            opponent_shortsighted_move = self.generate_shortsighted_move(board, opp_config)
             debug_str = f"Starting with move {tphm(move)},\n"
             debug_str += f"Predicts that enemy will shortsightedly move {tphm(opponent_shortsighted_move[0])}...\n"
-            player_resp = self.generate_shortsighted_move(new_board.copy().move(*opponent_shortsighted_move[0]), config)
+            move_cache_2 = board.move(*opponent_shortsighted_move[0])[1]
+            player_resp = self.generate_shortsighted_move(board, config)
+            board.unmove(move_cache_2)
             debug_str += f"Predicts that player will shortsightedly respond {tphm(player_resp[0])}...\n"
             debug_str += f"Results in value of {player_resp[1]}...\n"
-            return player_resp[1], debug_str
+            ret = (player_resp[1], debug_str)
+
+        board.unmove(move_cache)
+        return ret
 
     def generate_predictive_piece_value_move(self, board, config, depth = 1):
         """

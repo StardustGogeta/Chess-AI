@@ -35,9 +35,18 @@ class Board:
     
     # Performs a move of a piece from start to end positions
     def move(self, start, end):
+        move_cache = (start, end, self.board[start[0]][start[1]], self.board[end[0]][end[1]])
         piece = self.board[start[0]][start[1]]
         self.board[start[0]][start[1]] = 0
         self.board[end[0]][end[1]] = piece if len(end) == 2 else end[2] # Promotion
+        return self, move_cache
+
+    # Undoes a move using a cache of the old start and end positions and pieces
+    # TODO: Add en passant and castle support
+    def unmove(self, move_cache):
+        start, end, start_piece, end_piece = move_cache
+        self.board[start[0]][start[1]] = start_piece
+        self.board[end[0]][end[1]] = end_piece
         return self
 
     # Creates a deep copy of the current board
@@ -275,7 +284,9 @@ class Board:
 
     # Tells whether a move will put the king into check
     def puts_into_check(self, start, end, color):
-        return self.copy().move(start, end).check_for_attacks(color)
+        move_cache = self.move(start, end)[1]
+        self.check_for_attacks(color)
+        self.unmove(move_cache)
 
     # Returns a list of all valid destinations (y, x) for a piece at a given position
     def get_moves(self, pos, color, *, check_for_check = True):
