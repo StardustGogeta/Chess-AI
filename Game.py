@@ -4,13 +4,16 @@ from Skywalker import Skywalker
 from Misc import human_move_to_tuple
 
 DEBUGGING = True
+START_AS_WHITE = False
 
 class Game:
     def __init__(self):
         self.board = Board()
         self.ai = Skywalker()
-        self.ai_cfg = {"color": "black"}
+        self.ai_cfg = {"color": "white" if START_AS_WHITE else "black"}
         self.history = []
+        self.no_compute = not START_AS_WHITE
+        self.force_calc = False
 
     def run_game(self):
         # TODO: Check for game finish (stalemate, 50 turn rule, checkmate)
@@ -19,19 +22,31 @@ class Game:
             while True:
                 try:
                     print("\n" + "-" * 60 + "\n" + str(self.board) + "\n" + "-" * 60 + "\n")
-                    start = time.perf_counter()
-                    print("AI recommends... " + self.ai.generate_move_by_level(self.board, self.ai_cfg, 2))
-                    print(f"Time elapsed: {time.perf_counter()-start}")
+
+                    if self.force_calc or not self.no_compute:
+                        start = time.perf_counter()
+                        print("AI recommends... " + self.ai.generate_move_by_level(self.board, self.ai_cfg, 2))
+                        print(f"Time elapsed: {time.perf_counter()-start}")
+
                     move = input("Enter a move: ")
-                    if move == "REWIND":
+                    if move in ("REWIND", "UNDO"):
+                        # Undo the previous move
                         if len(self.history) > 1:
                             self.board = self.history[-2]
                             self.history.pop()
                             print("Reset board to previous state.")
                         else:
                             print("No board history available.")
+                    elif move in ("RECALC", "REROLL"):
+                        # Recalculate the AI move suggestion
+                        continue
+                    elif move in ("FORCECALC"):
+                        # Force the AI to calculate a move when it is not on the proper turn
+                        self.force_calc = True
                     else:
                         self.make_move(move)
+                        self.no_compute = not self.no_compute
+                        self.force_calc = False
                         break
                 except KeyboardInterrupt:
                     raise KeyboardInterrupt("Program ended by user.")
