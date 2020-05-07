@@ -35,6 +35,8 @@ class Game:
                             self.board = self.history[-2]
                             self.history.pop()
                             print("Reset board to previous state.")
+                            self.no_compute = not self.no_compute
+                            self.force_calc = False
                         else:
                             print("No board history available.")
                     elif move in ("RECALC", "REROLL"):
