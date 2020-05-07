@@ -53,6 +53,9 @@ class Board:
     def copy(self):
         return copy.deepcopy(self)
 
+    def hash(self):
+        return ''.join(str(e) for row in self.board for e in row)
+
     # Adds all valid rook moves for the given color to the moves list
     def __get_rook_moves__(self, pos, color, moves):
         y, x = pos

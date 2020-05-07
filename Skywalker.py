@@ -3,6 +3,7 @@
 
 import time, random
 from Misc import piece_color, tuple_pair_to_human_move, all_squares
+from OpeningBook import OpeningBook
 
 class Skywalker:
     # All configs are given as follows:
@@ -10,6 +11,8 @@ class Skywalker:
     # time_limit: number of seconds since starting
     # depth: maximum branch depth
 
+    def __init__(self):
+        self.opening_book = OpeningBook()
     
     def get_piece_value(self, board, config = None, *, color = None):
         """
@@ -154,41 +157,12 @@ class Skywalker:
         return best_move
 
     # Return a move in human format based on an opening book of good lines
-    # TODO: Match against board state instead of move sequence to allow transpositions
-    def generate_opening_book_move(self, turn_number, move_history):
-        sicilian = ['e2e4', 'c7c5', 'g1f3', 'd7d6', 'd2d4']
-        center = ['e2e4', 'e7e5', 'd2d4', 'e5d4']
-        king_pawn = ['e2e4', 'e7e5']
-        kpkn = king_pawn + ['g1f3', 'b8c6']
-        ruy_lopez = kpkn + ['f1b5', 'a7a6', 'b5a4']
-        french_defense = ['e2e4', 'e7e6', 'd2d4', 'd7d5']
-        french_classical = french_defense + ['b1c3', 'g8f6']
-        reti_base = ['g1f3']
-        reti = reti_base + ['d7d5']
-        reti1 = reti + ['c2c4', 'd5d4']
-        reti2 = reti + ['d2d4', 'c7c6']
-        reti_alt = reti_base + ['g8f6', 'd2d4']
-
-        lines = [
-            sicilian,
-            ruy_lopez,
-            french_classical,
-            reti1,
-            reti2,
-            reti_alt
-        ]
-
-        lines = list(filter(lambda line: len(line) > turn_number, lines))
-        for (i, move) in enumerate(move_history):
-            lines = list(filter(lambda line: line[i] == move, lines))
-        lines = list(lines) # These are all the lines that match the opening sequence and have at least one more move
-        if not lines:
-            return None
-        return random.choice(lines)[turn_number]
+    def generate_opening_book_move(self, move_history):
+        return self.opening_book.get_move(move_history)
 
     def generate_move_by_level(self, board, config, level, turn_number, move_history):
-        if turn_number <= 5: # Early opening
-            book_move = self.generate_opening_book_move(turn_number, move_history)
+        if turn_number <= 10: # Early opening
+            book_move = self.generate_opening_book_move(move_history)
             if book_move:
                 print("Book move match!")
                 return book_move
@@ -198,7 +172,6 @@ class Skywalker:
             # tuple_move = self.generate_predictive_piece_value_move(board, config, depth=level)[0]
             tuple_move = self.generate_alphabeta_move(board, config, depth=level)[0]
         return tuple_pair_to_human_move(tuple_move)
-
 
     def generate_move(self, board, config):
         # TODO: Consider previous board state for castling and en passant
