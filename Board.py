@@ -285,8 +285,9 @@ class Board:
     # Tells whether a move will put the king into check
     def puts_into_check(self, start, end, color):
         move_cache = self.move(start, end)[1]
-        self.check_for_attacks(color)
+        ret = self.check_for_attacks(color)
         self.unmove(move_cache)
+        return ret
 
     # Returns a list of all valid destinations (y, x) for a piece at a given position
     def get_moves(self, pos, color, *, check_for_check = True):
