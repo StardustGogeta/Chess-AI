@@ -1,4 +1,4 @@
-import copy
+import copy, random
 from Misc import piece_color, valid_pos, all_squares
 
 class Board:
@@ -330,11 +330,44 @@ class Board:
 
     # Get all available moves for a given player on the board
     def get_all_moves(self, color, *, check_for_check = True):
-        ret = []
-        for y in range(8):
-            for x in range(8):
-                ret.extend(((y, x), dest) for dest in self.get_moves((y, x), color, check_for_check=check_for_check))
-        return ret
+        for pos in all_squares():
+            piece_moves = self.get_moves(pos, color, check_for_check=check_for_check)
+            random.shuffle(piece_moves)
+            for move in piece_moves:
+                yield (pos, move)
+
+    # Get all available moves for a given player on the board, arranged with a smart ordering to them
+    def get_all_moves_smart(self, color, *, check_for_check = True):
+        values = {'p': 1, 'n': 3, 'b': 3, 'q': 9, 'k': 8, 'r': 5}
+
+        high_captures = []
+        equal_captures = []
+        low_captures = []
+        no_captures = []
+
+        for pos in all_squares():
+            piece = self.board[pos[0]][pos[1]]
+            if piece:
+                piece_moves = self.get_moves(pos, color, check_for_check=check_for_check)
+                if piece_moves:
+                    value = values[piece.lower()]
+                    # random.shuffle(piece_moves)
+                    for dest in piece_moves:
+                        target = self.board[dest[0]][dest[1]]
+                        move = (pos, dest)
+                        if target: # Captures
+                            target_value = values[target.lower()]
+                            diff = target_value - value
+                            if diff > 0:
+                                high_captures.append(move)
+                            elif diff < 0:
+                                low_captures.append(move)
+                            else:
+                                equal_captures.append(move)
+                        else:
+                            no_captures.append(move)
+        return high_captures + equal_captures + low_captures + no_captures
+
 
     def __repr__(self):
         return '\n'.join('\t'.join((f'[{piece}]' if piece else '*') for piece in row) for row in self.board)

@@ -25,7 +25,7 @@ class Game:
 
                     if self.force_calc or not self.no_compute:
                         start = time.perf_counter()
-                        print("AI recommends... " + self.ai.generate_move_by_level(self.board, self.ai_cfg, 2))
+                        print("AI recommends... " + self.ai.generate_move_by_level(self.board, self.ai_cfg, 3))
                         print(f"Time elapsed: {time.perf_counter()-start}")
 
                     move = input("Enter a move: ")

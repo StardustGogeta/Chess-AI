@@ -11,7 +11,7 @@ class Skywalker:
     # depth: maximum branch depth
 
     
-    def get_piece_value(self, board, config):
+    def get_piece_value(self, board, config = None, *, color = None):
         """
         Returns value of pieces remaining on board (difference of your pieces and opponent's pieces)
 
@@ -20,11 +20,13 @@ class Skywalker:
         Uses standard piece values (and 8 for king)
         """
         # print("Getting piece value!")
+        assert config or color
         board = board.board
+        color = color if color else config['color']
         values = {'p': 1, 'n': 3, 'b': 3, 'q': 9, 'k': 8, 'r': 5}
         black_value = sum(sum(values[piece] for piece in row if piece and piece_color(piece) == "black") for row in board)
         white_value = sum(sum(values[piece.lower()] for piece in row if piece and piece_color(piece) == "white") for row in board)
-        return white_value - black_value if config['color'] == 'white' else black_value - white_value
+        return white_value - black_value if color == 'white' else black_value - white_value
 
     def get_board_value(self, board, config):
         # TODO: Consider more factors in board value (e.g. position)
@@ -107,27 +109,29 @@ class Skywalker:
                         if debug_str: print(debug_str)
         return best_move
 
-    def alpha_beta_max(self, board, alpha, beta, depth_remaining, config):
+    def alpha_beta_max(self, board, alpha, beta, depth_remaining, color, opp_color):
         if not depth_remaining:
-            return self.generate_shortsighted_move(board, config)[1]
-        for move in board.get_all_moves(config['color']):
+            return self.get_piece_value(board, color=opp_color)
+        for move in board.get_all_moves_smart(color):
             move_cache = board.move(*move)[1]
-            score = self.alpha_beta_min(board, alpha, beta, depth_remaining, config)
+            score = self.alpha_beta_min(board, alpha, beta, depth_remaining - 1, color, opp_color)
             board.unmove(move_cache)
             if score >= beta:
+                #print(f"beta cut {depth_remaining}")
                 return beta
             if score > alpha:
                 alpha = score
         return alpha
 
-    def alpha_beta_min(self, board, alpha, beta, depth_remaining, config):
+    def alpha_beta_min(self, board, alpha, beta, depth_remaining, color, opp_color):
         if not depth_remaining:
-            return -1 * self.generate_shortsighted_move(board, config)[1]
-        for move in board.get_all_moves(config['color']):
+            return self.get_piece_value(board, color=color)
+        for move in board.get_all_moves_smart(opp_color):
             move_cache = board.move(*move)[1]
-            score = self.alpha_beta_max(board, alpha, beta, depth_remaining, config)
+            score = self.alpha_beta_max(board, alpha, beta, depth_remaining - 1, color, opp_color)
             board.unmove(move_cache)
             if score <= alpha:
+                #print(f"alpha cut {depth_remaining}")
                 return alpha
             if score < beta:
                 beta = score
@@ -140,19 +144,21 @@ class Skywalker:
         opp_config['color'] = opp_color
 
         best_move = (((0, 0), (0, 0)), -1000)
-        for move in board.get_all_moves(color):
+        for move in board.get_all_moves_smart(color):
             move_cache = board.move(*move)[1]
-            score = self.alpha_beta_max(board, -10**6, 10**6, depth, config)
+            score = self.alpha_beta_max(board, -10**6, 10**6, depth, color, opp_color)
             board.unmove(move_cache)
             if score > best_move[1]:
                 best_move = (move, score)
+            print(f"Testing {move}... score of {score}.")
         return best_move
 
     def generate_move_by_level(self, board, config, level):
         if level == 0:
             tuple_move = self.generate_naive_move(board, config)[0]
         else:
-            tuple_move = self.generate_predictive_piece_value_move(board, config, depth=level)[0]
+            # tuple_move = self.generate_predictive_piece_value_move(board, config, depth=level)[0]
+            tuple_move = self.generate_alphabeta_move(board, config, depth=level)[0]
         return tuple_pair_to_human_move(tuple_move)
 
 
