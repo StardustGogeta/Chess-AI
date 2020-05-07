@@ -105,8 +105,47 @@ class Skywalker:
                     if value > best_move[1]:
                         best_move = (move, value)
                         if debug_str: print(debug_str)
-        if best_move[1] == -1000:
-            return (((0, 0), (0, 0)), -1000)
+        return best_move
+
+    def alpha_beta_max(self, board, alpha, beta, depth_remaining, config):
+        if not depth_remaining:
+            return self.generate_shortsighted_move(board, config)[1]
+        for move in board.get_all_moves(config['color']):
+            move_cache = board.move(*move)[1]
+            score = self.alpha_beta_min(board, alpha, beta, depth_remaining, config)
+            board.unmove(move_cache)
+            if score >= beta:
+                return beta
+            if score > alpha:
+                alpha = score
+        return alpha
+
+    def alpha_beta_min(self, board, alpha, beta, depth_remaining, config):
+        if not depth_remaining:
+            return -1 * self.generate_shortsighted_move(board, config)[1]
+        for move in board.get_all_moves(config['color']):
+            move_cache = board.move(*move)[1]
+            score = self.alpha_beta_max(board, alpha, beta, depth_remaining, config)
+            board.unmove(move_cache)
+            if score <= alpha:
+                return alpha
+            if score < beta:
+                beta = score
+        return beta
+
+    def generate_alphabeta_move(self, board, config, depth):
+        color = config['color']
+        opp_color = 'white' if color == 'black' else 'black'
+        opp_config = config.copy()
+        opp_config['color'] = opp_color
+
+        best_move = (((0, 0), (0, 0)), -1000)
+        for move in board.get_all_moves(color):
+            move_cache = board.move(*move)[1]
+            score = self.alpha_beta_max(board, -10**6, 10**6, depth, config)
+            board.unmove(move_cache)
+            if score > best_move[1]:
+                best_move = (move, score)
         return best_move
 
     def generate_move_by_level(self, board, config, level):

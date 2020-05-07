@@ -272,7 +272,7 @@ class Board:
                 found = True
                 break
         if not found:
-            print(f"Looking for {target}, {color}, but not found!")
+            # print(f"Looking for {target}, {color}, but not found!")
             return False # To allow a dead side to make hypothetical postmortem moves
         # Check for attacking pieces
         for (y2, x2) in all_squares():
@@ -293,17 +293,15 @@ class Board:
         y, x = pos
         piece = self.board[y][x]
         if not piece:
-            # print("EMPTY")
             return []
         if piece:
-            # print("PIECE", piece, y, x)
-            lower = piece.lower()
             p_color = piece_color(piece)
 
             moves = []
 
             # Check that we are not moving the opponent's pieces
             if p_color == color:
+                lower = piece.lower()
                 # Rook or Queen
                 if lower == 'r' or lower == 'q':
                     self.__get_rook_moves__(pos, color, moves)
@@ -324,11 +322,19 @@ class Board:
                 if lower == 'p':
                     self.__get_pawn_moves__(pos, color, moves)
 
-            # if pos == (2, 7): print("PRECHECK", moves)
-            if check_for_check:
-                moves = list(filter(lambda move: not self.puts_into_check(pos, move, color), moves))
-            # if pos == (2, 7): print("\tPOSTCHECK", moves)
+                # if pos == (2, 7): print("PRECHECK", moves)
+                if check_for_check:
+                    moves = list(filter(lambda move: not self.puts_into_check(pos, move, color), moves))
+                # if pos == (2, 7): print("\tPOSTCHECK", moves)
             return moves
+
+    # Get all available moves for a given player on the board
+    def get_all_moves(self, color, *, check_for_check = True):
+        ret = []
+        for y in range(8):
+            for x in range(8):
+                ret.extend(((y, x), dest) for dest in self.get_moves((y, x), color, check_for_check=check_for_check))
+        return ret
 
     def __repr__(self):
         return '\n'.join('\t'.join((f'[{piece}]' if piece else '*') for piece in row) for row in self.board)
