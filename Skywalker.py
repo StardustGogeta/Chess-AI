@@ -13,6 +13,7 @@ class Skywalker:
 
     def __init__(self):
         self.opening_book = OpeningBook()
+        print("Opening book loaded.")
     
     def get_piece_value(self, board, config = None, *, color = None):
         """

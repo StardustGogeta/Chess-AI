@@ -100,7 +100,6 @@ class Game:
 
 
 if __name__ == "__main__":
-    print("Testing!")
     g = Game()
 
     # g.board.load([

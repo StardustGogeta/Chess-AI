@@ -13,7 +13,12 @@ class OpeningBook:
         kpkn = king_pawn + ['g1f3', 'b8c6']
         ruy_lopez = kpkn + ['f1b5', 'a7a6', 'b5a4']
 
-        french_defense = ['e2e4', 'e7e6', 'd2d4', 'd7d5']
+        king_pawn2 = king_pawn + ['d2d3', 'g8f6', 'g1f3', 'b8c6']
+        king_pawn2a = king_pawn2 + ['f1e2']
+        king_pawn2b = king_pawn2 + ['c2c3']
+        king_pawn2c = king_pawn2 + ['g2g3']
+
+        french_defense =      ['e2e4', 'e7e6', 'd2d4', 'd7d5']
         french_defense_alt1 = ['e2e4', 'd7d5', 'd2d4', 'e7e6']
         french_defense_alt2 = ['d2d4', 'e7e6', 'e2e4', 'd7d5']
         french_defense_alt3 = ['d2d4', 'd7d5', 'e2e4', 'e7e6']
@@ -25,10 +30,14 @@ class OpeningBook:
         reti2 = reti + ['d2d4', 'c7c6']
         reti_alt = reti_base + ['g8f6', 'd2d4']
 
+        # Some lines are strictly subsets of others, so we need not include them
         lines = [
             sicilian,
             center,
             ruy_lopez,
+            king_pawn2a,
+            king_pawn2b,
+            king_pawn2c,
             french_defense_alt1,
             french_defense_alt2,
             french_defense_alt3,
