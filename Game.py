@@ -17,6 +17,8 @@ class Game:
 
     def run_game(self):
         # TODO: Check for game finish (stalemate, 50 turn rule, checkmate)
+        turn_number = 0
+        move_history = []
         while True:
             self.history.append(self.board.copy())
             while True:
@@ -25,7 +27,7 @@ class Game:
 
                     if self.force_calc or not self.no_compute:
                         start = time.perf_counter()
-                        print("AI recommends... " + self.ai.generate_move_by_level(self.board, self.ai_cfg, 3))
+                        print("AI recommends... " + self.ai.generate_move_by_level(self.board, self.ai_cfg, 3, turn_number, move_history))
                         print(f"Time elapsed: {time.perf_counter()-start}")
 
                     move = input("Enter a move: ")
@@ -34,7 +36,9 @@ class Game:
                         if len(self.history) > 1:
                             self.board = self.history[-2]
                             self.history.pop()
+                            move_history.pop()
                             print("Reset board to previous state.")
+                            turn_number -= 10.5
                             self.no_compute = not self.no_compute
                             self.force_calc = False
                         else:
@@ -47,6 +51,8 @@ class Game:
                         self.force_calc = True
                     else:
                         self.make_move(move)
+                        move_history.append(move)
+                        turn_number += 1
                         self.no_compute = not self.no_compute
                         self.force_calc = False
                         break

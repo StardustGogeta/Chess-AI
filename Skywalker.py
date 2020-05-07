@@ -117,7 +117,7 @@ class Skywalker:
             score = self.alpha_beta_min(board, alpha, beta, depth_remaining - 1, color, opp_color)
             board.unmove(move_cache)
             if score >= beta:
-                #print(f"beta cut {depth_remaining}")
+                # print(f"beta cut {depth_remaining}", flush=True)
                 return beta
             if score > alpha:
                 alpha = score
@@ -131,7 +131,7 @@ class Skywalker:
             score = self.alpha_beta_max(board, alpha, beta, depth_remaining - 1, color, opp_color)
             board.unmove(move_cache)
             if score <= alpha:
-                #print(f"alpha cut {depth_remaining}")
+                # print(f"alpha cut {depth_remaining}", flush=True)
                 return alpha
             if score < beta:
                 beta = score
@@ -153,7 +153,45 @@ class Skywalker:
             print(f"Testing {move}... score of {score}.")
         return best_move
 
-    def generate_move_by_level(self, board, config, level):
+    # Return a move in human format based on an opening book of good lines
+    # TODO: Match against board state instead of move sequence to allow transpositions
+    def generate_opening_book_move(self, turn_number, move_history):
+        sicilian = ['e2e4', 'c7c5', 'g1f3', 'd7d6', 'd2d4']
+        center = ['e2e4', 'e7e5', 'd2d4', 'e5d4']
+        king_pawn = ['e2e4', 'e7e5']
+        kpkn = king_pawn + ['g1f3', 'b8c6']
+        ruy_lopez = kpkn + ['f1b5', 'a7a6', 'b5a4']
+        french_defense = ['e2e4', 'e7e6', 'd2d4', 'd7d5']
+        french_classical = french_defense + ['b1c3', 'g8f6']
+        reti_base = ['g1f3']
+        reti = reti_base + ['d7d5']
+        reti1 = reti + ['c2c4', 'd5d4']
+        reti2 = reti + ['d2d4', 'c7c6']
+        reti_alt = reti_base + ['g8f6', 'd2d4']
+
+        lines = [
+            sicilian,
+            ruy_lopez,
+            french_classical,
+            reti1,
+            reti2,
+            reti_alt
+        ]
+
+        lines = list(filter(lambda line: len(line) > turn_number, lines))
+        for (i, move) in enumerate(move_history):
+            lines = list(filter(lambda line: line[i] == move, lines))
+        lines = list(lines) # These are all the lines that match the opening sequence and have at least one more move
+        if not lines:
+            return None
+        return random.choice(lines)[turn_number]
+
+    def generate_move_by_level(self, board, config, level, turn_number, move_history):
+        if turn_number <= 5: # Early opening
+            book_move = self.generate_opening_book_move(turn_number, move_history)
+            if book_move:
+                print("Book move match!")
+                return book_move
         if level == 0:
             tuple_move = self.generate_naive_move(board, config)[0]
         else:
